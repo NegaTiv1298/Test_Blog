@@ -1,0 +1,12 @@
+.comment_info {
+    border-width: 1px;
+    border-style: solid;
+    border-color: black;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    font-family: 'Nunito', sans-serif;
+}
+
+body {
+    background: radial-gradient(circle farthest-corner at 100px 50px, #FBF2EB, #a0aec0);
+}

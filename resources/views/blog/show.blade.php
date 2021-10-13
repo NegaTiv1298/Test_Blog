@@ -36,11 +36,14 @@
 
         @foreach($info as $elem)
 
-            <div class="border border-dark rounded" align="center">
+            <div class="comment_info" align="center">
 
                 <p><b>Ім'я:</b> {{$elem->name}}</p>
                 <p><b>E-mail:</b> {{$elem->email}}</p>
                 <p><b>Текст:</b> {{$elem->text}}</p>
+                @if(!empty($elem->image))
+                    <p><img class="img-fluid" src="{{ asset('image/'. $elem->image) }}"/></p>
+                @endif
                 <p><b>Дата створення:</b> {{$elem->created_at}}</p>
 
 
@@ -55,10 +58,12 @@
                 @endif
                 <br>
             </div>
+
         @endforeach
 
+        {{$info->links()}}
 
-        <form method="post" action="{{ route('blog.post') }}">
+        <form method="post" action="{{ route('blog.post') }}" enctype="multipart/form-data">
             @csrf
             <div class="form">
                 <div class="mb-3">
@@ -70,6 +75,10 @@
                     <label for="email" class="form-label">Email address</label>
                     <input type="email" name="email" @if(!Auth::guest()) value="{{Auth::user()->email}}"
                            @endif class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label for="image" class="form-label">Image</label>
+                    <input type="file" name="image">
                 </div>
                 <div class="mb-3">
                     <label for="description" class="form-label">Текст</label>

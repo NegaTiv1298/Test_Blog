@@ -21,7 +21,7 @@
 
         @endif
         @foreach($info as $elem)
-            <div class="border border-dark rounded" align="center">
+            <div class="comment_info" align="center">
 
                 <form method="post" action="{{ route('approved.comment', $elem->id) }}">
                     @csrf
@@ -29,6 +29,9 @@
                     <p><b>Ім'я:</b> {{$elem->name}}</p>
                     <p><b>E-mail:</b> {{$elem->email}}</p>
                     <p><b>Текст:</b> {{$elem->text}}</p>
+                    @if(!empty($elem->image))
+                        <p><img class="img-fluid" src="{{ asset('image/'. $elem->image) }}"/></p>
+                    @endif
                     <p><b>Дата створення:</b> {{$elem->created_at}}</p>
 
                     <a class="nav-link" aria-current="page" href="card/{{$elem->id}}">Редагувати</a>
@@ -48,4 +51,5 @@
                 </form>
             </div>
     @endforeach
+    {{$info->links()}}
 @stop

@@ -4,11 +4,15 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\BlogRequest;
 use App\Models\Blog;
+use Intervention\Image\Facades\Image;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 
+/**
+ * Blog controller
+ */
 class BlogController extends Controller
 {
 
@@ -20,7 +24,7 @@ class BlogController extends Controller
      */
     public function index(Request $request)
     {
-            $info = Blog::where('approved', 1)->orderBy('created_at', 'desc')->paginate(10);
+        $info = Blog::where('approved', 1)->orderBy('created_at', 'desc')->paginate(2);
 
         return view('blog/show', [
             'info' => $info
@@ -53,6 +57,7 @@ class BlogController extends Controller
 
     /**
      * Saving records to the database
+     * Saving and resize pictures
      *
      * @param BlogRequest $request
      * @return mixed
@@ -64,17 +69,24 @@ class BlogController extends Controller
         $email = $request->input('email');
         $text = $request->input('description');
 
-            $blog = new Blog([
-                'name' => $name,
-                'email' => $email,
-                'text' => $text
-            ]);
-            $blog->save();
+        $image = $request->file('image');
+        $filename = time() . '.' . $image->extension();
+
+        $destinationPath = public_path('/image');
+        $img = Image::make($image->path());
+        $img->resize(320, 240, function ($constraint) {
+            $constraint->aspectRatio();
+        })->save($destinationPath . '/' . $filename);
+
+
+        $blog = new Blog([
+            'name' => $name,
+            'email' => $email,
+            'image' => $filename,
+            'text' => $text,
+        ]);
+        $blog->save();
 
         return redirect()->back()->withSuccess('Запис успішно створений');
     }
-
-
-
-
 }
