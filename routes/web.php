@@ -17,6 +17,8 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', [BlogController::class, 'index'])->name('index');
+
+Route::get('/sort', [BlogController::class, 'sort'])->name('sort.get');
 Route::post('/sort', [BlogController::class, 'sort'])->name('sort.post');
 Route::post('/save', [BlogController::class, 'save'])->name('blog.post');
 

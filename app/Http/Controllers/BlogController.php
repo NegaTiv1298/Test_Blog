@@ -24,7 +24,7 @@ class BlogController extends Controller
      */
     public function index(Request $request)
     {
-        $info = Blog::where('approved', 1)->orderBy('created_at', 'desc')->paginate(2);
+        $info = Blog::where('approved', 1)->orderBy('created_at', 'desc')->paginate(5);
 
         return view('blog/show', [
             'info' => $info
@@ -40,13 +40,13 @@ class BlogController extends Controller
     public function sort(Request $request)
     {
         $sort = $request->input('sort');
-        $info = Blog::orderBy('created_at', 'desc')->paginate(10);
+        $info = Blog::where('approved', 1)->orderBy('created_at', 'desc')->paginate(5);
 
         if (isset($sort)) {
             if ($sort == 'created_at') {
-                $info = Blog::orderBy($sort, 'desc')->paginate(10);
+                $info = Blog::where('approved', 1)->orderBy($sort, 'desc')->paginate(5);
             } elseif ($sort != 'created_at') {
-                $info = Blog::orderBy($sort, 'asc')->paginate(10);
+                $info = Blog::where('approved', 1)->orderBy($sort, 'asc')->paginate(5);
             }
         }
 
@@ -70,22 +70,30 @@ class BlogController extends Controller
         $text = $request->input('description');
 
         $image = $request->file('image');
-        $filename = time() . '.' . $image->extension();
+        if (!empty($image)) {
+            $filename = time() . '.' . $image->extension();
+            $destinationPath = public_path('/image');
+            $img = Image::make($image->path());
+            $img->resize(320, 240, function ($constraint) {
+                $constraint->aspectRatio();
+            })->save($destinationPath . '/' . $filename);
 
-        $destinationPath = public_path('/image');
-        $img = Image::make($image->path());
-        $img->resize(320, 240, function ($constraint) {
-            $constraint->aspectRatio();
-        })->save($destinationPath . '/' . $filename);
+            $blog = new Blog([
+                'name' => $name,
+                'email' => $email,
+                'text' => $text,
+                'image' => $filename
+            ]);
+            $blog->save();
 
-
-        $blog = new Blog([
-            'name' => $name,
-            'email' => $email,
-            'image' => $filename,
-            'text' => $text,
-        ]);
-        $blog->save();
+        } else {
+            $blog = new Blog([
+                'name' => $name,
+                'email' => $email,
+                'text' => $text,
+            ]);
+            $blog->save();
+        }
 
         return redirect()->back()->withSuccess('Запис успішно створений');
     }
